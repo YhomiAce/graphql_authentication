@@ -4,7 +4,7 @@ import { UserType } from '../../common/types/User';
 import { RegisterInput } from '../../common/dtos/RegisterInput';
 import { LoginResponse } from '../../common/types/LoginResponse';
 import { LoginInput } from '../../common/dtos/LoginInput';
-import { BiometricInput } from 'src/common/dtos/BiometricInput';
+import { BiometricInput } from '../../common/dtos/BiometricInput';
 
 @Resolver()
 export class AuthResolver {

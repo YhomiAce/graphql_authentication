@@ -7,6 +7,10 @@ export const inputDto = {
   password: '12345',
 };
 
+export const biometricInput = {
+    biometricKey: 'xvvxbxmhssx',
+}
+
 export const userMock: UserType = {
   id: Date.now(),
   email: inputDto.email,
