@@ -9,6 +9,13 @@ import { LoginInput } from '../../common/dtos/LoginInput';
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   * Register
+   *
+   * @async
+   * @param {RegisterInput} inputDto
+   * @returns {Promise<UserType>}
+   */
   @Mutation((returns) => UserType)
   async register(
     @Args('RegisterInput') inputDto: RegisterInput,
@@ -16,6 +23,13 @@ export class AuthResolver {
     return await this.authService.register(inputDto);
   }
 
+  /**
+   * Login
+   *
+   * @async
+   * @param {LoginInput} loginInput
+   * @returns {Promise<LoginResponse>}
+   */
   @Mutation((returns) => LoginResponse)
   async login(
     @Args('LoginInput') loginInput: LoginInput,
