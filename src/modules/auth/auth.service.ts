@@ -46,7 +46,7 @@ export class AuthService {
    *
    * @async
    * @param {RegisterInput} inputDto
-   * @returns {Promise<Partial<UserType>>}
+   * @returns {Promise<UserType>}
    */
   async register(inputDto: RegisterInput): Promise<UserType> {
     const user = await this.findUserByEmail(inputDto.email);
@@ -86,7 +86,7 @@ export class AuthService {
    * @async
    * @param {string} email
    * @param {string} password
-   * @returns {Promise<any>}
+   * @returns {Promise<User>}
    */
   async validateUserCredentials(
     email: string,
@@ -142,7 +142,7 @@ export class AuthService {
    *
    * @async
    * @param {AuthLoginDto} authLoginDto
-   * @returns {Promise<JwtTokenWithUserResponse>}
+   * @returns {Promise<LoginResponse>}
    */
   async login(authLoginDto: LoginInput): Promise<LoginResponse> {
     const { email, password } = authLoginDto;
@@ -160,8 +160,8 @@ export class AuthService {
    * Biometric Login user
    *
    * @async
-   * @param {AuthLoginDto} authLoginDto
-   * @returns {Promise<JwtTokenWithUserResponse>}
+   * @param {BiometricInput} inputDto
+   * @returns {Promise<LoginResponse>}
    */
   async biometricLogin(inputDto: BiometricInput): Promise<LoginResponse> {
     const user = await this.prismaService.user.findUnique({
