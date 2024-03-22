@@ -15,6 +15,8 @@ import { JWTPayload } from 'src/common/interface/jwt.payload.interface';
 import { LoginResponse } from 'src/common/types/LoginResponse';
 import { TokenType } from 'src/common/types/Token';
 import { LoginInput } from 'src/common/dtos/LoginInput';
+import { v4 as uuid } from 'uuid';
+import { BiometricInput } from 'src/common/dtos/BiometricInput';
 
 @Injectable()
 export class AuthService {
@@ -56,6 +58,7 @@ export class AuthService {
     const data: Prisma.UserCreateInput = {
       ...inputDto,
       password,
+      biometricKey: uuid(),
     };
     const newUser = await this.prismaService.user.create({ data });
     return newUser;
@@ -144,6 +147,26 @@ export class AuthService {
   async login(authLoginDto: LoginInput): Promise<LoginResponse> {
     const { email, password } = authLoginDto;
     let user = await this.validateUserCredentials(email, password);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return {
+      user: this.mapPrismaUserTouserType(user) as UserType,
+      token: await this.issueTokens(user),
+    };
+  }
+
+  /**
+   * Biometric Login user
+   *
+   * @async
+   * @param {AuthLoginDto} authLoginDto
+   * @returns {Promise<JwtTokenWithUserResponse>}
+   */
+  async biometricLogin(inputDto: BiometricInput): Promise<LoginResponse> {
+    const user = await this.prismaService.user.findUnique({
+      where: { biometricKey: inputDto.biometricKey },
+    });
     if (!user) {
       throw new UnauthorizedException();
     }

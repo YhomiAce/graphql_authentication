@@ -4,6 +4,7 @@ import { UserType } from '../../common/types/User';
 import { RegisterInput } from '../../common/dtos/RegisterInput';
 import { LoginResponse } from '../../common/types/LoginResponse';
 import { LoginInput } from '../../common/dtos/LoginInput';
+import { BiometricInput } from 'src/common/dtos/BiometricInput';
 
 @Resolver()
 export class AuthResolver {
@@ -16,7 +17,7 @@ export class AuthResolver {
    * @param {RegisterInput} inputDto
    * @returns {Promise<UserType>}
    */
-  @Mutation((returns) => UserType)
+  @Mutation(() => UserType)
   async register(
     @Args('RegisterInput') inputDto: RegisterInput,
   ): Promise<UserType> {
@@ -30,10 +31,24 @@ export class AuthResolver {
    * @param {LoginInput} loginInput
    * @returns {Promise<LoginResponse>}
    */
-  @Mutation((returns) => LoginResponse)
+  @Mutation(() => LoginResponse)
   async login(
     @Args('LoginInput') loginInput: LoginInput,
   ): Promise<LoginResponse> {
     return await this.authService.login(loginInput);
+  }
+
+  /**
+   * Biometric Login
+   *
+   * @async
+   * @param {BiometricInput} inputDto
+   * @returns {Promise<LoginResponse>}
+   */
+  @Mutation(() => LoginResponse, { name: 'biometricLogin' })
+  async biometricLogin(
+    @Args('BiometricInput') inputDto: BiometricInput,
+  ): Promise<LoginResponse> {
+    return await this.authService.biometricLogin(inputDto);
   }
 }

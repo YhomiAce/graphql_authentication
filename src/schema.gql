@@ -33,6 +33,7 @@ type Query {
 type Mutation {
   register(RegisterInput: RegisterInput!): UserType!
   login(LoginInput: LoginInput!): LoginResponse!
+  biometricLogin(BiometricInput: BiometricInput!): LoginResponse!
 }
 
 input RegisterInput {
@@ -43,4 +44,8 @@ input RegisterInput {
 input LoginInput {
   email: String!
   password: String!
+}
+
+input BiometricInput {
+  biometricKey: String!
 }
