@@ -2,6 +2,29 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type UserType {
+  id: Int!
+  email: String!
+  password: String
+  biometricKey: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
-  hello: String!
+  user: UserType!
+}
+
+type Mutation {
+  register(RegisterInput: RegisterInput!): UserType!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
 }

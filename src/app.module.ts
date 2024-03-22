@@ -4,6 +4,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { formatError } from './common/utils/format-error';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -12,9 +14,11 @@ import { AuthModule } from './modules/auth/auth.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'src/schema.gql',
+      formatError: (err) => formatError(err),
     }),
     PrismaModule,
     AuthModule,
+    UserModule,
   ],
   providers: [],
 })

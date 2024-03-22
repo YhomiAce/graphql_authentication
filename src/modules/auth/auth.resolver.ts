@@ -1,5 +1,7 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
+import { UserType } from 'src/common/types/User';
+import { RegisterInput } from 'src/common/dtos/RegisterInput';
 
 @Resolver()
 export class AuthResolver {
@@ -7,8 +9,9 @@ export class AuthResolver {
         private readonly authService: AuthService
     ){}
 
-    @Query((returns) => String)
-    hello(){
-        return "Hello";
+   
+    @Mutation(returns => UserType)
+    async register(@Args("RegisterInput") inputDto: RegisterInput) {
+        return await this.authService.register(inputDto);
     }
 }
