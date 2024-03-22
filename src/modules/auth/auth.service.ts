@@ -46,7 +46,7 @@ export class AuthService {
    * @param {RegisterInput} inputDto
    * @returns {Promise<Partial<UserType>>}
    */
-  async register(inputDto: RegisterInput): Promise<Partial<UserType>> {
+  async register(inputDto: RegisterInput): Promise<UserType> {
     const user = await this.findUserByEmail(inputDto.email);
     if (user) {
       throw new HttpException('User Already Exist', HttpStatus.CONFLICT);
@@ -58,7 +58,7 @@ export class AuthService {
       password,
     };
     const newUser = await this.prismaService.user.create({ data });
-    return this.mapPrismaUserTouserType(newUser);
+    return newUser;
   }
 
   /**
@@ -148,7 +148,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
     return {
-      user,
+      user: this.mapPrismaUserTouserType(user) as UserType,
       token: await this.issueTokens(user),
     };
   }

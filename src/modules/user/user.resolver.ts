@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Context, Query, Resolver } from '@nestjs/graphql';
-import { UserType } from 'src/common/types/User';
+import { UserType } from '../../common/types/User';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 
 @Resolver()
