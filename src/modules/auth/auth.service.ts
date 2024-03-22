@@ -107,7 +107,7 @@ export class AuthService {
    * @param {User} user
    * @returns {TokenType}
    */
-  async getTokens(user: User): Promise<TokenType> {
+  async issueTokens(user: User): Promise<TokenType> {
     const payload: JWTPayload = {
       username: user.email,
       sub: user.id,
@@ -149,7 +149,7 @@ export class AuthService {
     }
     return {
       user,
-      token: await this.getTokens(user),
+      token: await this.issueTokens(user),
     };
   }
 }
