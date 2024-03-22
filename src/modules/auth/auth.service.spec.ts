@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { inputDto, loginResponse, userMock } from './__mocks__/user.mock';
+import { biometricInput, inputDto, loginResponse, userMock } from './__mocks__/user.mock';
 import * as bcrypt from 'bcrypt';
 import { HttpException, UnauthorizedException } from '@nestjs/common';
 import { LoginInput } from '../../common/dtos/LoginInput';
@@ -108,6 +108,39 @@ describe('AuthService', () => {
       jest.spyOn(service, 'validateUserCredentials').mockResolvedValue(null);
 
       await expect(service.login(inputDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+  });
+
+  describe('BiometricLogin', () => {
+    it('should successfully log in a user', async () => {
+      jest
+        .spyOn(mockPrismaService.user, 'findUnique')
+        .mockResolvedValue(userMock);
+      jest.spyOn(service, 'issueTokens').mockResolvedValue(loginResponse.token);
+
+      const result = await service.biometricLogin(biometricInput);
+
+      expect(result.user).toEqual({
+        id: userMock.id,
+        email: userMock.email,
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
+      });
+
+      expect(result.token.accessToken).toBe(loginResponse.token.accessToken);
+      expect(result.token.refreshToken).toBe(loginResponse.token.refreshToken);
+    });
+
+    it('should throw UnauthorizedException for invalid credentials', async () => {
+      const inputDto = {
+        biometricKey: 'xvvxbxmhssxyyydhd'
+      };
+
+      jest.spyOn(mockPrismaService.user, 'findUnique').mockResolvedValue(null);
+
+      await expect(service.biometricLogin(inputDto)).rejects.toThrow(
         UnauthorizedException,
       );
     });
