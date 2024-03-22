@@ -26,7 +26,10 @@ async function bootstrap() {
     new ResponseInterceptor(),
     new ClassSerializerInterceptor(app.get(Reflector)),
   );
-  app.useGlobalFilters(new PrismaClientExceptionFilter());
+  app.useGlobalFilters(
+    new PrismaClientExceptionFilter(),
+    // new HttpExceptionFilter(),
+  );
 
   await app.listen(3000);
 }
