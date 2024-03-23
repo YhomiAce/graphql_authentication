@@ -27,13 +27,15 @@ export class AuthService {
   ) {}
 
   /**
-   * Find User
+   * Find User By email
    *
    * @async
    * @param {string} email
    * @returns {Promise<User | null>}
    */
   async findUserByEmail(email: string): Promise<User | null> {
+    // Find a user by the given email
+    // extract this to a method as it is used in multiple place
     const user = await this.prismaService.user.findUnique({ where: { email } });
     if (!user) {
       return null;
@@ -49,12 +51,20 @@ export class AuthService {
    * @returns {Promise<UserType>}
    */
   async register(inputDto: RegisterInput): Promise<UserType> {
+    // check if the email is already registered
     const user = await this.findUserByEmail(inputDto.email);
+
+    // Throw an exception for already used email
     if (user) {
       throw new HttpException('User Already Exist', HttpStatus.CONFLICT);
     }
+    // Generate salt to hash password
     const salt = await bcrypt.genSalt(10);
+
+    // hash the password
     const password = await bcrypt.hash(inputDto.password, salt);
+
+    // create user and generate unique uuid for user biometric(simulating)
     const data: Prisma.UserCreateInput = {
       ...inputDto,
       password,
@@ -92,14 +102,22 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<User> {
+    // find the user by the email
     const user = await this.findUserByEmail(email);
+
+    // Return null if user is not found
     if (!user) {
       return null;
     }
+
+    // Compare the saved hashed password to the hash of the incoming password
     const isMatch = await bcrypt.compare(password, user.password);
+
+    // return user if password match
     if (isMatch) {
       return user;
     }
+    // return null if password do not match
     return null;
   }
 
@@ -111,11 +129,13 @@ export class AuthService {
    * @returns {TokenType}
    */
   async issueTokens(user: User): Promise<TokenType> {
+    // JWT payload to identify the user
     const payload: JWTPayload = {
       username: user.email,
       sub: user.id,
     };
 
+    // Generate JWT tokens for access and refresh tokens
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configService.get<string>('JWT_USER_ACCESS_SECRET'),
@@ -131,6 +151,7 @@ export class AuthService {
       }),
     ]);
 
+    // Return the tokens
     return {
       accessToken: `Bearer ${accessToken}`,
       refreshToken: `Bearer ${refreshToken}`,
@@ -146,10 +167,13 @@ export class AuthService {
    */
   async login(authLoginDto: LoginInput): Promise<LoginResponse> {
     const { email, password } = authLoginDto;
+    // Validate the user credentials
     let user = await this.validateUserCredentials(email, password);
+    // throw unauthorized error if the creedential is invalid
     if (!user) {
       throw new UnauthorizedException();
     }
+    // Return the user and the access tokens
     return {
       user: this.mapPrismaUserTouserType(user) as UserType,
       token: await this.issueTokens(user),
@@ -164,12 +188,16 @@ export class AuthService {
    * @returns {Promise<LoginResponse>}
    */
   async biometricLogin(inputDto: BiometricInput): Promise<LoginResponse> {
+    // find the user with the biometrickey
     const user = await this.prismaService.user.findUnique({
       where: { biometricKey: inputDto.biometricKey },
     });
+
+    // throw unauthorized error if the user is not found
     if (!user) {
       throw new UnauthorizedException();
     }
+    // Return the user and the access tokens
     return {
       user: this.mapPrismaUserTouserType(user) as UserType,
       token: await this.issueTokens(user),
